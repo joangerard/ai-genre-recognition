@@ -5,6 +5,7 @@ import glob
 import numpy as np
 import matplotlib.pyplot as plt
 from text import Text
+from neural_network import NeuralNetwork
 from keras.models import Sequential
 from keras.layers import Dense, Activation
 from keras.utils.np_utils import to_categorical
@@ -68,7 +69,7 @@ def cross_validation_data(all_data):
 
 def train_nn(train_input, train_output, test_input, test_output):
     model = Sequential([
-        Dense(100, input_dim=np.shape(train_input)[1]),
+        Dense(2000, input_dim=np.shape(train_input)[1]),
         Activation('relu'),
         Dense(10),
         Activation('softmax'),
@@ -92,10 +93,14 @@ if __name__ == '__main__':
     file_name = 'test.txt'
     text = Text()
 
+    nn = NeuralNetwork()
+
+
     # features, labels = generate_features_and_labels()
     # all_data = np.column_stack((features, labels))
     # text.write(file_name, all_data)
     all_data = text.read(file_name)
     train_input, train_output, test_input, test_output = cross_validation_data(all_data)
-    train_nn(train_input, train_output, test_input, test_output)
+    nn.fit(train_input, train_output)
+    # train_nn(train_input, train_output, test_input, test_output)
 
