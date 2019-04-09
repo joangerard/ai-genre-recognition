@@ -3,21 +3,79 @@ import numpy as np
 class NeuralNetwork:
 
     def __init__(self):
-        self.dimi_1 = 25001
+        self.dimi_1 = 25000
         self.dimo_1 = 100
 
-        self.dimi_2 = 101
+        self.dimi_2 = 100
         self.dimo_2 = 10
         self.epsilon_theta = 0.12
         self.theta1 = []
         self.theta2 = []
+        self.lamb = 1
 
     def fit(self, training_inputs, training_outputs):
+        self.theta1 = self.random_init_theta(self.dimi_1 + 1, self.dimo_1, self.epsilon_theta) # 100 x 25001
+        self.theta2 = self.random_init_theta(self.dimi_2 + 1, self.dimo_2, self.epsilon_theta) # 10 x 101
+
+        theta = np.concatenate((self.theta1, self.theta2), axis=None)
+
+        backprop_params = self.gradientFunction(training_inputs, training_outputs, theta, self.lamb, self.dimo_1, self.dimi_1, self.dimo_2)
+        self.gradientCheck(theta, backprop_params, self.dimi_1, self.dimo_1, self.dimo_2, self.lamb, training_inputs, training_outputs)
+        # print("Cost Function", cf)
+
+    def gradientCheck(self, theta, backprop_params, input_layer_size, hidden_layer_size, num_labels, lamb, training_inputs, training_outputs):
+        epsilon = 0.0001
+        n_elems = len(theta)
+
+        for i in range(10):
+            x = int(np.random.rand()*n_elems)
+            epsilon_vec = np.zeros((n_elems, 1))
+            epsilon_vec[x] = epsilon
+
+            cost_high = self.costFunction(training_inputs, training_outputs, theta + epsilon_vec.flatten(), lamb, hidden_layer_size, input_layer_size, num_labels)
+            cost_low = self.costFunction(training_inputs, training_outputs, theta - epsilon_vec.flatten(), lamb, hidden_layer_size, input_layer_size, num_labels)
+
+            aprox_grad = (cost_high - cost_low)/float(2 * epsilon)
+            print("Element: {0}. Numerical Gradient = {1:.9f}. BackProp Gradient = {2:.9f}.".format(x, aprox_grad, backprop_params[x]))
+
+    def gradientFunction(self, training_inputs, training_outputs, theta, lamb, hidden_layer_size, input_layer_size, num_labels):
+        theta1 = np.reshape(theta[:(hidden_layer_size * (input_layer_size + 1))], (hidden_layer_size, input_layer_size + 1))
+        theta2 = np.reshape(theta[(hidden_layer_size * (input_layer_size + 1)):], (num_labels, hidden_layer_size + 1))
+
+        delta1 = np.zeros(theta1.shape)
+        delta2 = np.zeros(theta2.shape)
+
+        m = len(training_outputs)
+
+        for i in range(training_inputs.shape[0]):
+            ones = np.ones(1)
+
+            a1 = np.hstack((ones, training_inputs[i]))
+            z2 = np.matmul(a1, theta1.T)
+            a2 = self.sigmoid_function(z2) # 800, 100
+            a2 = np.hstack((ones, a2))
+            z3 = np.matmul(a2, theta2.T)
+            a3 = self.sigmoid_function(z3)
+
+            d3 = a3 - training_outputs[i]
+            z2 = np.hstack((ones, z2))
+            d2 = np.multiply(np.matmul(theta2.T, d3), self.sigmoid_derivate_function(z2).T)
+
+            delta1 = delta1 + d2[1:, np.newaxis] @ a1[np.newaxis, :]
+            delta2 = delta2 + d3[:, np.newaxis] @ a2 [np.newaxis, :]
+
+        delta1[:, 1:] = 1/m * delta1[:, 1:] + lamb * theta1[:, 1:] # j != 0
+        delta1[:, 0] = 1/m * delta1[:, 0] # j == 0
+
+        delta2[:, 1:] = 1/m * delta2[:, 1:] + lamb * theta2[:, 1:]
+        delta2[:, 0] = 1/m * delta2[:, 0]
+
+        return np.hstack((delta1.ravel(), delta2.ravel()))
 
 
     def costFunction(self, training_inputs, training_outputs, theta, lamb, hidden_layer_size, input_layer_size, num_labels):
-        theta1 = np.reshape(theta[:(hidden_layer_size * input_layer_size +1)], (hidden_layer_size, input_layer_size + 1))
-        theta2 = np.reshape(theta[(hidden_layer_size * input_layer_size +1):], (num_labels, hidden_layer_size + 1))
+        theta1 = np.reshape(theta[:(hidden_layer_size * (input_layer_size + 1))], (hidden_layer_size, input_layer_size + 1))
+        theta2 = np.reshape(theta[(hidden_layer_size * (input_layer_size + 1)):], (num_labels, hidden_layer_size + 1))
 
         m = len(training_outputs)
         ones = np.ones((m, 1))
@@ -51,5 +109,8 @@ class NeuralNetwork:
     def sigmoid_function(self, z):
         return 1/(1 + np.exp(-z))
 
+    def sigmoid_derivate_function(self, z):
+        return np.multiply(self.sigmoid_function(z), 1 - self.sigmoid_function(z))
+
     def random_init_theta(self, dimi, dimo, epsilon):
-        return  np.random.rand(dimo, dimi)*2*epsilon - epsilon
+        return np.random.rand(dimo, dimi)*2*epsilon - epsilon
