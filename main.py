@@ -10,9 +10,11 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation
 from keras.utils.np_utils import to_categorical
 
+
 def song_converter(index):
     songs = ['blues', 'classical', 'country', 'disco', 'hiphop', 'jazz', 'metal', 'pop', 'reggae', 'rock']
     return songs[index]
+
 
 def display_mfcc(song):
     y, _ = librosa.load(song)
@@ -24,6 +26,7 @@ def display_mfcc(song):
     plt.title(song)
     plt.tight_layout()
     plt.show()
+
 
 def extract_features_song(song):
     y, _ = librosa.load(song)
@@ -40,7 +43,7 @@ def generate_features_and_labels():
 
     genres = ['blues', 'classical', 'country', 'disco', 'hiphop', 'jazz', 'metal', 'pop', 'reggae', 'rock']
     for genre in genres:
-        sound_files = glob.glob('genres/'+genre+'/*.au')
+        sound_files = glob.glob('genres/' + genre + '/*.au')
         print('Processing %d songs in %s genre... ' % (len(sound_files), genre))
         for song in sound_files:
             features = extract_features_song(song)
@@ -52,6 +55,7 @@ def generate_features_and_labels():
     onehot_labels = to_categorical(label_row_ids, len(label_uniq_ids))
 
     return np.stack(all_features), onehot_labels
+
 
 def cross_validation_data(all_data):
     training_split = 0.8
@@ -65,7 +69,6 @@ def cross_validation_data(all_data):
 
     test_input = test[:, :-10]
     test_labels = test[:, -10:]
-
 
     return train_input, train_labels, test_input, test_labels
 
@@ -91,13 +94,12 @@ def train_nn(train_input, train_output, test_input, test_output):
     print('Done')
     print("Loss: %.4f, accuracy: %.4f" % (loss, acc))
 
-if __name__ == '__main__':
 
+if __name__ == '__main__':
     file_name = 'test.txt'
     text = Text()
 
     nn = NeuralNetwork()
-
 
     # features, labels = generate_features_and_labels()
     # all_data = np.column_stack((features, labels))
@@ -109,5 +111,5 @@ if __name__ == '__main__':
     # nn.fit(train_input, train_output)
     # train_nn(train_input, train_output, test_input, test_output)
 
-    data = extract_features_song('samples/song_blues.mp3')
+    data = extract_features_song('samples/Avril.mp3')
     print(song_converter(nn.predict_custom(data)))
