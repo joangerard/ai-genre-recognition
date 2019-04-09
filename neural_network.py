@@ -18,8 +18,8 @@ class NeuralNetwork:
         self.text = Text()
 
     def predict_custom(self, data):
-        thetha_opt = self.text.read('theta_opt_l12.txt')
-        theta1, theta2 = self.extract_thetas(thetha_opt, self.dimi_1, self.dimo_1, self.dimo_2)
+        theta_opt = self.text.read('theta_opt_l12.txt')
+        theta1, theta2 = self.extract_thetas(theta_opt, self.dimi_1, self.dimo_1, self.dimo_2)
 
         ones = np.ones(1)
         a1 = np.hstack((ones, data))
@@ -32,9 +32,9 @@ class NeuralNetwork:
         return np.argmax(a3)
 
     def accuracy(self, test_input, test_output):
-        thetha_opt = self.text.read('theta_opt_l12.txt')
-        theta1, theta2 = self.extract_thetas(thetha_opt, self.dimi_1, self.dimo_1, self.dimo_2)
-        accurates = 0
+        theta_opt = self.text.read('theta_opt_l12.txt')
+        theta1, theta2 = self.extract_thetas(theta_opt, self.dimi_1, self.dimo_1, self.dimo_2)
+        accuracies = 0
 
         m = len(test_input)
 
@@ -49,9 +49,9 @@ class NeuralNetwork:
             a3 = self.sigmoid_function(z3)
 
             if test_output[i][np.argmax(a3)] == 1:
-                accurates += 1
+                accuracies += 1
 
-        return accurates / m
+        return accuracies / m
 
     def fit(self, training_inputs, training_outputs):
         self.theta1 = self.random_init_theta(self.dimi_1 + 1, self.dimo_1, self.epsilon_theta)  # 100 x 25001
@@ -59,7 +59,7 @@ class NeuralNetwork:
 
         theta = np.concatenate((self.theta1, self.theta2), axis=None)
 
-        theta_opt = opt.fmin_cg(f=self.costFunction, x0=theta, fprime=self.gradientFunction,
+        theta_opt = opt.fmin_cg(f=self.cost_function, x0=theta, fprime=self.gradient_function,
                                 args=(
                                     training_inputs, training_outputs, self.lamb, self.dimo_1, self.dimi_1,
                                     self.dimo_2),
@@ -72,8 +72,8 @@ class NeuralNetwork:
 
     # def  predict(self, theta_opt):
 
-    def gradientCheck(self, theta, backprop_params, input_layer_size, hidden_layer_size, num_labels, lamb,
-                      training_inputs, training_outputs):
+    def gradient_check(self, theta, backprop_params, input_layer_size, hidden_layer_size, num_labels, lamb,
+                       training_inputs, training_outputs):
         epsilon = 0.0001
         n_elems = len(theta)
 
@@ -82,10 +82,10 @@ class NeuralNetwork:
             epsilon_vec = np.zeros((n_elems, 1))
             epsilon_vec[x] = epsilon
 
-            cost_high = self.costFunction(theta + epsilon_vec.flatten(), training_inputs, training_outputs, lamb,
+            cost_high = self.cost_function(theta + epsilon_vec.flatten(), training_inputs, training_outputs, lamb,
+                                           hidden_layer_size, input_layer_size, num_labels)
+            cost_low = self.cost_function(theta - epsilon_vec.flatten(), training_inputs, training_outputs, lamb,
                                           hidden_layer_size, input_layer_size, num_labels)
-            cost_low = self.costFunction(theta - epsilon_vec.flatten(), training_inputs, training_outputs, lamb,
-                                         hidden_layer_size, input_layer_size, num_labels)
 
             aprox_grad = (cost_high - cost_low) / float(2 * epsilon)
             print("Element: {0}. Numerical Gradient = {1:.9f}. BackProp Gradient = {2:.9f}.".format(x, aprox_grad,
@@ -98,8 +98,8 @@ class NeuralNetwork:
 
         return theta1, theta2
 
-    def gradientFunction(self, theta, training_inputs, training_outputs, lamb, hidden_layer_size, input_layer_size,
-                         num_labels):
+    def gradient_function(self, theta, training_inputs, training_outputs, lamb, hidden_layer_size, input_layer_size,
+                          num_labels):
         theta1, theta2 = self.extract_thetas(theta, input_layer_size, hidden_layer_size, num_labels)
 
         delta1 = np.zeros(theta1.shape)
@@ -132,8 +132,8 @@ class NeuralNetwork:
         print('Gradient function finishing... ')
         return np.hstack((delta1.ravel(), delta2.ravel()))
 
-    def costFunction(self, theta, training_inputs, training_outputs, lamb, hidden_layer_size, input_layer_size,
-                     num_labels):
+    def cost_function(self, theta, training_inputs, training_outputs, lamb, hidden_layer_size, input_layer_size,
+                      num_labels):
         theta1 = np.reshape(theta[:(hidden_layer_size * (input_layer_size + 1))],
                             (hidden_layer_size, input_layer_size + 1))
         theta2 = np.reshape(theta[(hidden_layer_size * (input_layer_size + 1)):], (num_labels, hidden_layer_size + 1))
