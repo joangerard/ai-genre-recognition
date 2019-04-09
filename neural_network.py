@@ -1,4 +1,6 @@
 import numpy as np
+import scipy.optimize as opt
+from text import Text
 
 class NeuralNetwork:
 
@@ -11,7 +13,47 @@ class NeuralNetwork:
         self.epsilon_theta = 0.12
         self.theta1 = []
         self.theta2 = []
-        self.lamb = 1
+        self.lamb = 1.2
+        self.text = Text()
+
+    def predict_custom(self, data):
+        thetha_opt = self.text.read('theta_opt_l12.txt')
+        theta1, theta2 = self.extract_thetas(thetha_opt, self.dimi_1, self.dimo_1, self.dimo_2)
+
+        ones = np.ones(1)
+        a1 = np.hstack((ones, data))
+        z2 = np.matmul(a1, theta1.T)
+        a2 = self.sigmoid_function(z2)
+        a2 = np.hstack((ones, a2))
+        z3 = np.matmul(a2, theta2.T)
+        a3 = self.sigmoid_function(z3)
+
+        return np.argmax(a3)
+
+
+    def accuracy(self, test_input, test_output):
+        thetha_opt = self.text.read('theta_opt_l12.txt')
+        theta1, theta2 = self.extract_thetas(thetha_opt, self.dimi_1, self.dimo_1, self.dimo_2)
+        accurates = 0
+
+        m = len(test_input)
+
+        for i in range(0, m):
+            ones = np.ones(1)
+
+            a1 = np.hstack((ones, test_input[i]))
+            z2 = np.matmul(a1, theta1.T)
+            a2 = self.sigmoid_function(z2) # 800, 100
+            a2 = np.hstack((ones, a2))
+            z3 = np.matmul(a2, theta2.T)
+            a3 = self.sigmoid_function(z3)
+
+
+            if test_output[i][np.argmax(a3)] == 1:
+                accurates += 1
+
+        return accurates/m
+
 
     def fit(self, training_inputs, training_outputs):
         self.theta1 = self.random_init_theta(self.dimi_1 + 1, self.dimo_1, self.epsilon_theta) # 100 x 25001
@@ -19,9 +61,15 @@ class NeuralNetwork:
 
         theta = np.concatenate((self.theta1, self.theta2), axis=None)
 
-        backprop_params = self.gradientFunction(training_inputs, training_outputs, theta, self.lamb, self.dimo_1, self.dimi_1, self.dimo_2)
-        self.gradientCheck(theta, backprop_params, self.dimi_1, self.dimo_1, self.dimo_2, self.lamb, training_inputs, training_outputs)
+        theta_opt = opt.fmin_cg(f=self.costFunction, x0=theta, fprime=self.gradientFunction,
+                                args=(training_inputs, training_outputs, self.lamb, self.dimo_1, self.dimi_1, self.dimo_2), maxiter=50)
+
+        self.text.write('theta_opt_l12.txt', theta_opt)
+
+        # self.gradientCheck(theta, backprop_params, self.dimi_1, self.dimo_1, self.dimo_2, self.lamb, training_inputs, training_outputs)
         # print("Cost Function", cf)
+
+    # def  predict(self, theta_opt):
 
     def gradientCheck(self, theta, backprop_params, input_layer_size, hidden_layer_size, num_labels, lamb, training_inputs, training_outputs):
         epsilon = 0.0001
@@ -32,15 +80,21 @@ class NeuralNetwork:
             epsilon_vec = np.zeros((n_elems, 1))
             epsilon_vec[x] = epsilon
 
-            cost_high = self.costFunction(training_inputs, training_outputs, theta + epsilon_vec.flatten(), lamb, hidden_layer_size, input_layer_size, num_labels)
-            cost_low = self.costFunction(training_inputs, training_outputs, theta - epsilon_vec.flatten(), lamb, hidden_layer_size, input_layer_size, num_labels)
+            cost_high = self.costFunction(theta + epsilon_vec.flatten(), training_inputs, training_outputs, lamb, hidden_layer_size, input_layer_size, num_labels)
+            cost_low = self.costFunction(theta - epsilon_vec.flatten(), training_inputs, training_outputs, lamb, hidden_layer_size, input_layer_size, num_labels)
 
             aprox_grad = (cost_high - cost_low)/float(2 * epsilon)
             print("Element: {0}. Numerical Gradient = {1:.9f}. BackProp Gradient = {2:.9f}.".format(x, aprox_grad, backprop_params[x]))
 
-    def gradientFunction(self, training_inputs, training_outputs, theta, lamb, hidden_layer_size, input_layer_size, num_labels):
+    def extract_thetas(self, theta, input_layer_size, hidden_layer_size, num_labels):
         theta1 = np.reshape(theta[:(hidden_layer_size * (input_layer_size + 1))], (hidden_layer_size, input_layer_size + 1))
         theta2 = np.reshape(theta[(hidden_layer_size * (input_layer_size + 1)):], (num_labels, hidden_layer_size + 1))
+
+        return theta1, theta2
+
+
+    def gradientFunction(self, theta, training_inputs, training_outputs, lamb, hidden_layer_size, input_layer_size, num_labels):
+        theta1, theta2 = self.extract_thetas(theta, input_layer_size, hidden_layer_size, num_labels)
 
         delta1 = np.zeros(theta1.shape)
         delta2 = np.zeros(theta2.shape)
@@ -64,16 +118,16 @@ class NeuralNetwork:
             delta1 = delta1 + d2[1:, np.newaxis] @ a1[np.newaxis, :]
             delta2 = delta2 + d3[:, np.newaxis] @ a2 [np.newaxis, :]
 
-        delta1[:, 1:] = 1/m * delta1[:, 1:] + lamb * theta1[:, 1:] # j != 0
-        delta1[:, 0] = 1/m * delta1[:, 0] # j == 0
+        delta1[:, 1:] = 1/m * delta1[:, 1:] + lamb * theta1[:, 1:]/m # j != 0
+        delta1[:, 0] = 1/m * delta1[:, 0]/m # j == 0
 
-        delta2[:, 1:] = 1/m * delta2[:, 1:] + lamb * theta2[:, 1:]
-        delta2[:, 0] = 1/m * delta2[:, 0]
-
+        delta2[:, 1:] = 1/m * delta2[:, 1:] + lamb * theta2[:, 1:]/m
+        delta2[:, 0] = 1/m * delta2[:, 0]/m
+        print('Gradient function finishing... ')
         return np.hstack((delta1.ravel(), delta2.ravel()))
 
 
-    def costFunction(self, training_inputs, training_outputs, theta, lamb, hidden_layer_size, input_layer_size, num_labels):
+    def costFunction(self, theta,  training_inputs, training_outputs, lamb, hidden_layer_size, input_layer_size, num_labels):
         theta1 = np.reshape(theta[:(hidden_layer_size * (input_layer_size + 1))], (hidden_layer_size, input_layer_size + 1))
         theta2 = np.reshape(theta[(hidden_layer_size * (input_layer_size + 1)):], (num_labels, hidden_layer_size + 1))
 
@@ -91,8 +145,9 @@ class NeuralNetwork:
 
         sum1 = np.sum(np.sum(np.power(theta1[:,1:], 2), axis = 1))
         sum2 = np.sum(np.sum(np.power(theta2[:,1:], 2), axis = 1))
-
-        return np.sum(-(1/m)*temp3) + (sum1 + sum2) * lamb/(2 * m)
+        val = np.sum(-(1/m)*temp3) + (sum1 + sum2) * lamb/(2 * m)
+        print('Cost function: ', val)
+        return val
 
 
     def forward_propagation(self, a_1, theta1, theta2):
