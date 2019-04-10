@@ -3,9 +3,11 @@ from django.urls import include, path
 from django.conf.urls import url
 from django.conf.urls.static import static
 from django.conf import settings
+from django.views.generic.base import RedirectView
 
 urlpatterns = [
 
+    path('', RedirectView.as_view(pattern_name='to_do_list:upload')),
     # When request http://localhost:8000/admin/, it will use url mappings defined in admin.site.urls.py file
     path('admin/', admin.site.urls),
 

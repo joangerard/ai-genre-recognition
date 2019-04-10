@@ -14,6 +14,7 @@ urlpatterns = [
     path('list_all', views.to_do_list, name='to_do_list'),
     path('upload', views.upload, name='upload'),
     path('prediction/<value>/', views.prediction, name='prediction'),
+    path('about_us', views.about_us, name='about_us'),
     # <id> is a placeholder that will be replaced with the real record id.
     path('show_detail/<id>/', views.to_do_detail, name='to_do_detail'),
 ]

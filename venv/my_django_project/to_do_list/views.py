@@ -21,19 +21,23 @@ def home(request):
 
 def upload(request):
     if request.method == 'POST':
-        upload_file = request.FILES['document']
-        fs = FileSystemStorage()
-        fs.save(upload_file.name, upload_file)
-        manager = Manager()
-        
-        base_url = 'prediction'
-        prediction = manager.predict(fs.path(upload_file.name)) # 2 category=42
-        url = '{}/{}'.format(base_url, prediction)
-        return redirect(url)
+        upload_file = request.FILES.get('document')
+        if upload_file and upload_file.size > 0:
+            fs = FileSystemStorage()
+            fs.save(upload_file.name, upload_file)
+            manager = Manager()
+
+            base_url = 'prediction'
+            prediction = manager.predict(fs.path(upload_file.name)) # 2 category=42
+            url = '{}/{}'.format(base_url, prediction)
+            return redirect(url)
     return render(request, PROJECT_PATH + '/pages/upload.html')
 
 def prediction(request, value):
     return render(request, PROJECT_PATH + '/pages/prediction.html', {'value': value})
+
+def about_us(request):
+    return render(request, PROJECT_PATH + '/pages/about_us.html')
 
 # This function will display todos in a list page the request url is http://localhost:8000/to_do/list_all.
 def to_do_list(request):
