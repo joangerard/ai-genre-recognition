@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>To Do Detail Page</title>
+</head>
+<body>
+{% extends "to_do_list/pages/base.html" %}
+{% block content %}
+<p>{{todo.to_do_things}}</p>
+<ul>
+    <li>Creation Date : {{todo.create_date}}</li>
+    <li>Handle Date : {{todo.handle_date}}</li>
+</ul>
+{% endblock content%}
+</body>
+</html>

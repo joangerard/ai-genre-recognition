@@ -6,8 +6,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from text import Text
 from neural_network import NeuralNetwork
-from keras.models import Sequential
-from keras.layers import Dense, Activation
+# from keras.models import Sequential
+# from keras.layers import Dense, Activation
 from keras.utils.np_utils import to_categorical
 
 def song_converter(index):
@@ -69,27 +69,27 @@ def cross_validation_data(all_data):
 
     return train_input, train_labels, test_input, test_labels
 
-
-def train_nn(train_input, train_output, test_input, test_output):
-    model = Sequential([
-        Dense(2000, input_dim=np.shape(train_input)[1]),
-        Activation('relu'),
-        Dense(10),
-        Activation('softmax'),
-    ])
-
-    model.compile(optimizer='adam',
-                  loss='categorical_crossentropy',
-                  metrics=['accuracy'])
-
-    print(model.summary())
-
-    model.fit(train_input, train_output, epochs=10, batch_size=32, validation_split=0.2)
-
-    loss, acc = model.evaluate(test_input, test_output, batch_size=32)
-
-    print('Done')
-    print("Loss: %.4f, accuracy: %.4f" % (loss, acc))
+#
+# def train_nn(train_input, train_output, test_input, test_output):
+#     model = Sequential([
+#         Dense(2000, input_dim=np.shape(train_input)[1]),
+#         Activation('relu'),
+#         Dense(10),
+#         Activation('softmax'),
+#     ])
+#
+#     model.compile(optimizer='adam',
+#                   loss='categorical_crossentropy',
+#                   metrics=['accuracy'])
+#
+#     print(model.summary())
+#
+#     model.fit(train_input, train_output, epochs=10, batch_size=32, validation_split=0.2)
+#
+#     loss, acc = model.evaluate(test_input, test_output, batch_size=32)
+#
+#     print('Done')
+#     print("Loss: %.4f, accuracy: %.4f" % (loss, acc))
 
 if __name__ == '__main__':
 
