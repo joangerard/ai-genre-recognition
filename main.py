@@ -6,10 +6,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from text import Text
 from neural_network import NeuralNetwork
-from keras.models import Sequential
-from keras.layers import Dense, Activation
-from keras.utils.np_utils import to_categorical
-
 
 def song_converter(index):
     songs = ['blues', 'classical', 'country', 'disco', 'hiphop', 'jazz', 'metal', 'pop', 'reggae', 'rock']
@@ -105,11 +101,10 @@ if __name__ == '__main__':
     # all_data = np.column_stack((features, labels))
     # text.write(file_name, all_data)
     all_data = text.read(file_name)
-    # train_input, train_output, test_input, test_output = cross_validation_data(all_data)
+    train_input, train_output, test_input, test_output = cross_validation_data(all_data)
 
     # print(nn.accuracy(test_input, test_output))
-    # nn.fit(train_input, train_output)
+    nn.fit_with_different_lambdas(train_input, train_output)
     # train_nn(train_input, train_output, test_input, test_output)
 
-    data = extract_features_song('samples/Avril.mp3')
-    print(song_converter(nn.predict_custom(data)))
+
