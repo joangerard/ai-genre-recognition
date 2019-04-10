@@ -15,9 +15,10 @@ class NeuralNetwork:
         self.theta1 = []
         self.theta2 = []
         self.lamb = 1.2
-        self.lambdas = [0, 0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 5]
+        self.lambdas = [0, 0.2, 0.5, 1, 1.3, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]
         self.text = Text()
         self.epochs = 8
+        self.maxiter = 100
 
     def predict_custom(self, data):
         theta_opt = self.text.read('theta_opt_l12.txt')
@@ -33,8 +34,18 @@ class NeuralNetwork:
 
         return np.argmax(a3)
 
-    def accuracy(self, test_input, test_output):
-        theta_opt = self.text.read('theta_opt_l12.txt')
+    def accurary_all(self, test_input, test_output):
+        accuracies = []
+        for lamb in self.lambdas:
+            accuracies.append(self.accuracy(test_input, test_output, self.get_theta_lamb_filename(lamb)))
+            print('Acuraccy for lambda {0} done.'.format(lamb))
+        return accuracies
+
+    def get_theta_lamb_filename(self, lamb):
+        return 'theta_all_average_lamb{0}.txt'.format(str(lamb).replace(".", "_"))
+
+    def accuracy(self, test_input, test_output, theta_opt_file):
+        theta_opt = self.text.read(theta_opt_file)
         theta1, theta2 = self.extract_thetas(theta_opt, self.dimi_1, self.dimo_1, self.dimo_2)
         accuracies = 0
 
@@ -64,17 +75,16 @@ class NeuralNetwork:
 
             theta_opt = opt.fmin_cg(f=self.cost_function, x0=theta, fprime=self.gradient_function,
                                     args=(
-                                        training_inputs[epoch * 100:(epoch + 1) * 100][:],
-                                        training_outputs[epoch * 100:(epoch + 1) * 100][:], lamb, self.dimo_1,
+                                        training_inputs[epoch * 100:((epoch + 1) * 100 - 1)][:],
+                                        training_outputs[epoch * 100:((epoch + 1) * 100 - 1)][:], lamb, self.dimo_1,
                                         self.dimi_1,
                                         self.dimo_2),
-                                    maxiter=100)
+                                    maxiter=self.maxiter)
             theta_all.append(theta_opt)
 
             self.text.write('theta_opt_lamb{0} ephoc_{1}.txt'.format(str(lamb).replace(".", "_"), epoch), theta_opt)
         self.text.write('theta_all_lamb{0}.txt'.format(str(lamb).replace(".", "_")), theta_all)
-        theta_1_average, theta_2_average = self.average_theta_all(theta_all)
-        theta_all_average = np.concatenate((theta_1_average, theta_2_average), axis=None)
+        theta_all_average = np.array([sum(x) for x in zip(*theta_all)]) / self.epochs
         self.text.write('theta_all_average_lamb{0}.txt'.format(str(lamb).replace(".", "_")), theta_all_average)
         # self.gradientCheck(theta, backprop_params, self.dimi_1, self.dimo_1, self.dimo_2, self.lamb, training_inputs, training_outputs)
         # print("Cost Function", cf)

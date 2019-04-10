@@ -106,5 +106,5 @@ if __name__ == '__main__':
     # print(nn.accuracy(test_input, test_output))
     nn.fit_with_different_lambdas(train_input, train_output)
     # train_nn(train_input, train_output, test_input, test_output)
-
+    # print(nn.accurary_all(test_input, test_output))
 
