@@ -15,9 +15,9 @@ class NeuralNetwork:
         self.theta1 = []
         self.theta2 = []
         self.lamb = 1.2
-        self.lambdas = [0.001, 0.01, 0.1, 1, 10]
+        self.lambdas = [0, 0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 5]
         self.text = Text()
-        self.epochs = 4
+        self.epochs = 8
 
     def predict_custom(self, data):
         theta_opt = self.text.read('theta_opt_l12.txt')
@@ -64,12 +64,14 @@ class NeuralNetwork:
 
             theta_opt = opt.fmin_cg(f=self.cost_function, x0=theta, fprime=self.gradient_function,
                                     args=(
-                                        training_inputs[epoch*200:(epoch+1)*200][:], training_outputs[epoch*200:(epoch+1)*200][:], lamb, self.dimo_1, self.dimi_1,
+                                        training_inputs[epoch * 100:(epoch + 1) * 100][:],
+                                        training_outputs[epoch * 100:(epoch + 1) * 100][:], lamb, self.dimo_1,
+                                        self.dimi_1,
                                         self.dimo_2),
-                                    maxiter=50)
+                                    maxiter=100)
             theta_all.append(theta_opt)
 
-            self.text.write('theta_opt_lamb{0} ephoc_{1}.txt'.format(str(lamb).replace(".", "_"),epoch), theta_opt)
+            self.text.write('theta_opt_lamb{0} ephoc_{1}.txt'.format(str(lamb).replace(".", "_"), epoch), theta_opt)
         self.text.write('theta_all_lamb{0}.txt'.format(str(lamb).replace(".", "_")), theta_all)
         theta_1_average, theta_2_average = self.average_theta_all(theta_all)
         theta_all_average = np.concatenate((theta_1_average, theta_2_average), axis=None)
@@ -79,16 +81,16 @@ class NeuralNetwork:
 
     # def  predict(self, theta_opt):
 
-    def average_theta_all(self,theta_all):
-        theta_1_average = np.zeros((self.dimo_1,self.dimi_1+1))
-        theta_2_average = np.zeros((self.dimo_2,self.dimi_2+1))
+    def average_theta_all(self, theta_all):
+        theta_1_average = np.zeros((self.dimo_1, self.dimi_1 + 1))
+        theta_2_average = np.zeros((self.dimo_2, self.dimi_2 + 1))
         for theta_opt in theta_all:
             theta1, theta2 = self.extract_thetas(theta_opt, self.dimi_1, self.dimo_1, self.dimo_2)
             theta_1_average += theta1
             theta_2_average += theta2
         theta_1_average /= self.epochs
         theta_2_average /= self.epochs
-        return theta_1_average,theta_2_average
+        return theta_1_average, theta_2_average
 
     def fit_with_different_lambdas(self, training_inputs, training_outputs):
         for lamb in self.lambdas:
