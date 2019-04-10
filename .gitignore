@@ -109,3 +109,5 @@ venv.bak/
 /venv/bin
 
 */media/*
+test.txt
+theta_opt_*
