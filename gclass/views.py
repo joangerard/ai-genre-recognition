@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect
 # Import ToDo model class defined in current models.py file.
-from .models import ToDo
 from django.core.files.storage import FileSystemStorage
 from urllib.parse import urlencode
 from .core.manager import Manager

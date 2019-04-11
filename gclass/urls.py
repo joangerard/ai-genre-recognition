@@ -1,7 +1,6 @@
 from django.urls import path
 # import views from local directory.
 from . import views
-from django.conf.urls import url
 
 urlpatterns = [
     # The first parameter is the url path.

@@ -91,7 +91,7 @@ class Manager:
         return self.song_converter(prediction), values
 
     def prediction_bar_plot(self, values, name):
-        name += '.png'
+        name += 'bar.png'
         # print('values: ', values)
         plt.bar(['blues', 'class', 'cntry', 'disco', 'hiphop', 'jazz', 'metal', 'pop', 'reggae', 'rock'], values)
         plt.title('Probability of classification')
