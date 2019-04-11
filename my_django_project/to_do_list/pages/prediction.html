@@ -1,0 +1,17 @@
+
+<!-- extends the parent template file -->
+{% extends "to_do_list/pages/base.html" %}
+{% block content %}
+<div class="vertical-center justify-content-center">
+    <div class="row">
+        <div class="col-sm-12">
+            <h1>The Neural Network thinks your song is <span class="btn btn-info"> <h2> {{ value }}</h2> </span> genre.</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <a href="{% url 'to_do_list:upload' %}" class="btn btn-primary" role="button">Back to upload</a>
+        </div>
+    </div>
+</div>
+{% endblock content%}

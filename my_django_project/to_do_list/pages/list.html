@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>To Do List Page</title>
+</head>
+<body>
+{% extends "to_do_list/pages/base.html" %}
+{% block content %}
+<p>All Todos List</p>
+<ul>
+    {% for todo in todos %}
+    <li><a href="{% url 'to_do_list:to_do_detail' todo.id %}">{{todo}}</a></li>
+    {% empty %}
+    <li>No todos have been added yet.</li>
+    {% endfor%}
+</ul>
+
+{% endblock content%}
+</body>
+</html>
