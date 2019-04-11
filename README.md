@@ -3,7 +3,11 @@ AI application that recognizes genre of songs.
 ## Setup
 Create virtual environment
 ```bash
-pipenv shell
+virtualenv -p python3.7 env
+```
+Activate virtual environment
+```bash
+source env/bin/activate
 ```
 Install dependencies
 ```bash
