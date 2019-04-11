@@ -24,9 +24,22 @@ class Manager:
         plt.figure(figsize=(10, 4))
         librosa.display.specshow(mfcc, x_axis='time', y_axis='mel')
         plt.colorbar()
-        plt.title(song)
+        plt.title('Spectogram')
         plt.tight_layout()
         plt.show()
+
+    def save_mfcc(self, song, name):
+        path = ''.join(e for e in name if e.isalnum()) + '.png'
+        y, _ = librosa.load(song)
+        mfcc = librosa.feature.mfcc(y)
+
+        plt.figure(figsize=(10, 4))
+        librosa.display.specshow(mfcc, x_axis='time', y_axis='mel')
+        plt.colorbar()
+        plt.title(name)
+        plt.tight_layout()
+        plt.savefig('media/'+path)
+        return path
 
     def extract_features_song(self, song):
         y, _ = librosa.load(song)
@@ -74,47 +87,13 @@ class Manager:
 
     def predict(self, data):
         features = self.extract_features_song(data)
-        return self.song_converter(self.nn.predict_custom(features))
+        prediction, values = self.nn.predict_custom(features)
+        return self.song_converter(prediction), values
 
-#
-# def train_nn(train_input, train_output, test_input, test_output):
-#     model = Sequential([
-#         Dense(2000, input_dim=np.shape(train_input)[1]),
-#         Activation('relu'),
-#         Dense(10),
-#         Activation('softmax'),
-#     ])
-#
-#     model.compile(optimizer='adam',
-#                   loss='categorical_crossentropy',
-#                   metrics=['accuracy'])
-#
-#     print(model.summary())
-#
-#     model.fit(train_input, train_output, epochs=10, batch_size=32, validation_split=0.2)
-#
-#     loss, acc = model.evaluate(test_input, test_output, batch_size=32)
-#
-#     print('Done')
-#     print("Loss: %.4f, accuracy: %.4f" % (loss, acc))
-
-# if __name__ == '__main__':
-#
-#     file_name = 'test.txt'
-#     text = Text()
-#
-#     nn = NeuralNetwork()
-#
-#
-#     # features, labels = generate_features_and_labels()
-#     # all_data = np.column_stack((features, labels))
-#     # text.write(file_name, all_data)
-#     all_data = text.read(file_name)
-#     # train_input, train_output, test_input, test_output = cross_validation_data(all_data)
-#
-#     # print(nn.accuracy(test_input, test_output))
-#     # nn.fit(train_input, train_output)
-#     # train_nn(train_input, train_output, test_input, test_output)
-#
-#     data = extract_features_song('samples/song_blues.mp3')
-#     print(song_converter(nn.predict_custom(data)))
+    def prediction_bar_plot(self, values, name):
+        name += '.png'
+        # print('values: ', values)
+        plt.bar(['blues', 'class', 'cntry', 'disco', 'hiphop', 'jazz', 'metal', 'pop', 'reggae', 'rock'], values)
+        plt.title('Probability of classification')
+        plt.savefig('media/'+name)
+        return name

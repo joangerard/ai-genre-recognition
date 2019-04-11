@@ -28,7 +28,7 @@ class NeuralNetwork:
         z3 = np.matmul(a2, theta2.T)
         a3 = self.sigmoid_function(z3)
 
-        return np.argmax(a3)
+        return np.argmax(a3), a3
 
 
     def accuracy(self, test_input, test_output):
