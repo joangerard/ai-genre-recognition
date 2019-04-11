@@ -10,7 +10,7 @@
             <hr class="my-4">
             <p>Upload your song file and we will try to recognize the gender of music that is being played. </p>
             <p class="lead">
-            <form method="post" enctype="multipart/form-data">
+            <form method="post" action="/gclass/upload" enctype="multipart/form-data">
                 {% csrf_token %}
                 <input type="file" name="document" class="btn btn-outline-info">
                 <button type="submit" class="btn btn-info">Upload file</button>
@@ -20,8 +20,25 @@
             <form method="post" action="/gclass/upload_zip" enctype="multipart/form-data">
                 {% csrf_token %}
                 <input type="file" name="document" class="btn btn-outline-info">
-                <button type="submit" class="btn btn-info">Upload .zip file</button>
+                <button id="zip_button" type="submit" class="btn btn-info">Upload .zip file</button>
+                <p id="not_valid_zip">
+                    {% if not_valid_zip %}
+                    Please, select a .zip file
+                    {% endif %}
+                </p>
+                <p id="not_valid_file">
+                    {% if not_valid_object %}
+                    Please, select a file
+                    {% endif %}
+                </p>
             </form>
+
+
         </div>
     </div>
+    <script>
+      $("#zip_button").click(function () {
+          $("#not_valid_zip").hide()
+      })
+    </script>
 {% endblock content%}
