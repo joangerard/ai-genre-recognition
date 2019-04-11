@@ -5,6 +5,9 @@ from django.core.files.storage import FileSystemStorage
 from urllib.parse import urlencode
 from .core.manager import Manager
 from django.urls import reverse
+from zipfile import ZipFile
+import shutil
+from django.http import HttpResponse, Http404
 
 import os
 
@@ -24,6 +27,31 @@ def upload(request):
             url = '{}/{}'.format(base_url, prediction)
             return redirect(url)
     return render(request, PROJECT_PATH + '/pages/upload.html')
+
+def upload_zip(request):
+    if request.method == 'POST':
+        upload_file = request.FILES.get('document')
+        with ZipFile(upload_file) as zip_file:
+            names = zip_file.namelist()
+
+            for name in names[1:]:
+                if "__MACOSX" not in name:
+                    with zip_file.open(name) as f:
+                        split_name = name.split('/')
+                        name_to_store = split_name[1] if len(split_name) > 1 else name
+                        fs = FileSystemStorage()
+                        fs.save('input/'+name_to_store, f)
+                        manager = Manager()
+                        prediction = manager.predict(fs.path('input/'+name_to_store)) # 2 category=42
+                        url_output = 'output/{0}/{1}'.format(prediction,name_to_store)
+                        fs.save(url_output, f)
+
+        shutil.make_archive('media/music', 'zip', 'media/output')
+        with open('media/music.zip', 'rb') as fh:
+            response = HttpResponse(fh.read(), content_type="application/vnd.ms-excel")
+            response['Content-Disposition'] = 'inline; filename=' + os.path.basename('media/music.zip')
+            return response
+    return render('', PROJECT_PATH + '/pages/upload.html')
 
 def prediction(request, value):
     return render(request, PROJECT_PATH + '/pages/prediction.html', {'value': value})
