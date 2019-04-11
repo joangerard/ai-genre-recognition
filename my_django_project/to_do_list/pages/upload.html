@@ -16,6 +16,12 @@
                 <button type="submit" class="btn btn-info">Upload file</button>
             </form>
             </p>
+            <p>Or you can upload a zip file containing all your music and we will classify it for you!</p>
+            <form method="post" action="/to_do/upload_zip" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="file" name="document" class="btn btn-outline-info">
+                <button type="submit" class="btn btn-info">Upload .zip file</button>
+            </form>
         </div>
     </div>
 {% endblock content%}

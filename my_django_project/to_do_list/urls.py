@@ -13,6 +13,7 @@ urlpatterns = [
     # For example, in html code {% url 'to_do_list:to_do_list' %} will be mapped to url http://localhost:8000/to_do/list_all
     path('list_all', views.to_do_list, name='to_do_list'),
     path('upload', views.upload, name='upload'),
+    path('upload_zip', views.upload_zip, name='upload_zip'),
     path('prediction/<value>/', views.prediction, name='prediction'),
     path('about_us', views.about_us, name='about_us'),
     # <id> is a placeholder that will be replaced with the real record id.
