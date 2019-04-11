@@ -6,8 +6,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from .text import Text
 from .neural_network import NeuralNetwork
-# from keras.models import Sequential
-# from keras.layers import Dense, Activation
 # from keras.utils.np_utils import to_categorical
 
 class Manager:
