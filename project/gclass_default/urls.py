@@ -7,7 +7,7 @@ from django.views.generic.base import RedirectView
 
 urlpatterns = [
 
-    path('', RedirectView.as_view(pattern_name='to_do_list:upload')),
+    path('', RedirectView.as_view(pattern_name='gclass:upload')),
     # When request http://localhost:8000/admin/, it will use url mappings defined in admin.site.urls.py file
     path('admin/', admin.site.urls),
 
@@ -15,7 +15,7 @@ urlpatterns = [
     # The include function must contains a tuple and a namespace key value pair. 
     # The tuple first element is the app urls mapping file, the second element is the application name.
     # If do not provide the application name, it will throw Specifying a namespace in include() without providing an app_name is not supported error.
-    url('^to_do/', include(('to_do_list.urls','to_do_list'), namespace='to_do_list'))
+    url('^gclass/', include(('gclass.urls', 'gclass'), namespace='gclass'))
 ]
 
 if settings.DEBUG:
