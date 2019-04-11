@@ -110,6 +110,6 @@ venv.bak/
 
 /venv/bin
 
-*/media/*
+*/media/*.png
+*/media/*au
 test.txt
-theta_opt_*

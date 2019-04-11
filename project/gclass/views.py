@@ -23,8 +23,10 @@ def upload(request):
             manager = Manager()
 
             base_url = 'prediction'
-            prediction = manager.predict(fs.path(upload_file.name)) # 2 category=42
-            url = '{}/{}'.format(base_url, prediction)
+            prediction, values = manager.predict(fs.path(upload_file.name)) # 2 category=42
+            bar = manager.prediction_bar_plot(values, upload_file.name)
+            mfcc_path = manager.save_mfcc(fs.path(upload_file.name), upload_file.name)
+            url = '{}/{}/{}/{}'.format(base_url, prediction, mfcc_path, bar)
             return redirect(url)
     return render(request, PROJECT_PATH + '/pages/upload.html')
 
@@ -53,8 +55,8 @@ def upload_zip(request):
             return response
     return render('', PROJECT_PATH + '/pages/upload.html')
 
-def prediction(request, value):
-    return render(request, PROJECT_PATH + '/pages/prediction.html', {'value': value})
+def prediction(request, value, mfcc_path, bar):
+    return render(request, PROJECT_PATH + '/pages/prediction.html', {'value': value, 'mfcc_path': mfcc_path, 'bar': bar})
 
 def about_us(request):
     return render(request, PROJECT_PATH + '/pages/about_us.html')
