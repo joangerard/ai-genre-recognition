@@ -39,7 +39,7 @@ def upload(request):
 @csrf_exempt
 def upload_zip(request):
     if request.method == 'POST':
-        upload_file = request.FILES.get('file')
+        upload_file = request.FILES.get('file') if request.FILES.get('file') else request.FILES.get('zip_doc')
         # form = FileUploadForm(data=request.POST, files=request.FILES)
         if upload_file and upload_file.size > 0:
             is_valid_zip = zipfile.is_zipfile(upload_file)
@@ -68,6 +68,9 @@ def download_zip(request):
         with open('media/music.zip', 'rb') as fh:
             response = HttpResponse(fh.read(), content_type="application/vnd.ms-excel")
             response['Content-Disposition'] = 'inline; filename=' + os.path.basename('media/music.zip')
+            response["Cache-Control"] = "must-revalidate"
+            response["Pragma"] = "must-revalidate"
+            response["Content-type"] = "application/bib"
             return response
 
 

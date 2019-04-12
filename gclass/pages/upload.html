@@ -34,41 +34,45 @@
         </div>
     </div>
     <script>
-    $( document ).ready(function() {
-        $("#loader").hide();
-        $("#not_valid_file").hide();
-        $("#download_zip").hide();
-        $('#form_zip' )
-            .submit( function( e ) {
-                $("#loader").show();
+        $(function() {
+            $( document ).ready(function() {
+                $("#loader").hide();
                 $("#not_valid_file").hide();
                 $("#download_zip").hide();
-                var data = new FormData($('#zip_doc'));
-                var input_zip = $('#zip_doc')
-                $.each(input_zip[0].files, function(i, file) {
-                    data.append('file', file);
-                });
-                $.ajax({
-                    url: '/gclass/upload_zip',
-                    data: data,
-                    cache: false,
-                    contentType: false,
-                    processData: false,
-                    method: 'POST',
-                    type: 'POST',
-                    success: function(data){
-                        $('#zip_download').click();
-                    },
-                    error: function(data) {
-                        $("#not_valid_file").show();
-                        $("#not_valid_file").text(data['responseJSON']['message'])
-                    },
-                    complete: function(data) {
-                        $("#loader").hide();
-                    }
-                });
-                e.preventDefault();
-            } );
-    });
+                $('#form_zip' )
+                    .submit( function( e ) {
+                        e.preventDefault();
+                        $("#loader").show();
+                        $("#not_valid_file").hide();
+                        $("#download_zip").hide();
+                        var data = new FormData(this);
+                        var input_zip = $('#zip_doc');
+                        $.each(input_zip[0].files, function(i, file) {
+                            data.append('file', file);
+                        });
+                        $.ajax({
+                            url: '/gclass/upload_zip',
+                            data: data,
+                            cache: false,
+                            contentType: false,
+                            processData: false,
+                            method: 'POST',
+                            type: 'POST',
+                            success: function(data){
+                                $('#zip_download').click();
+                            },
+                            error: function(data) {
+                                $("#not_valid_file").show();
+                                $("#not_valid_file").text(data['responseJSON']['message'])
+                            },
+                            complete: function(data) {
+                                $("#loader").hide();
+                            }
+                        });
+
+                    } );
+            });
+        })
+
     </script>
 {% endblock content%}
