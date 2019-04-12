@@ -31,14 +31,20 @@
                     Please, select a file
                     {% endif %}
                 </p>
+                <img id="loader" src="/media/loader.gif" width="40" height="40"/>
             </form>
 
 
         </div>
     </div>
     <script>
-      $("#zip_button").click(function () {
-          $("#not_valid_zip").hide()
-      })
+    $( document ).ready(function() {
+        $("#loader").hide();
+        console.log( "ready!" );
+        $("#zip_button").click(function () {
+            $("#loader").show();
+            $("#not_valid_zip").hide()
+        })
+    });
     </script>
 {% endblock content%}
