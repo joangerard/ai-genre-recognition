@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.core.files.storage import FileSystemStorage
 from urllib.parse import urlencode
 from .core.manager import Manager
+from .core.plotter import Plotter
 from django.urls import reverse
 
 import os
@@ -17,11 +18,12 @@ def upload(request):
             fs = FileSystemStorage()
             fs.save(upload_file.name, upload_file)
             manager = Manager()
+            plotter = Plotter()
 
             base_url = 'prediction'
             prediction, values = manager.predict(fs.path(upload_file.name)) # 2 category=42
-            bar = manager.prediction_bar_plot(values, upload_file.name)
-            mfcc_path = manager.save_mfcc(fs.path(upload_file.name), upload_file.name)
+            bar = plotter.prediction_bar_plot(values, upload_file.name)
+            mfcc_path = plotter.save_mfcc(fs.path(upload_file.name), upload_file.name)
             url = '{}/{}/{}/{}'.format(base_url, prediction, mfcc_path, bar)
             return redirect(url)
     return render(request, PROJECT_PATH + '/pages/upload.html')

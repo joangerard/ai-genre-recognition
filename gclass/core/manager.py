@@ -28,19 +28,6 @@ class Manager:
         plt.tight_layout()
         plt.show()
 
-    def save_mfcc(self, song, name):
-        path = ''.join(e for e in name if e.isalnum()) + '.png'
-        y, _ = librosa.load(song)
-        mfcc = librosa.feature.mfcc(y)
-
-        plt.figure(figsize=(10, 4))
-        librosa.display.specshow(mfcc, x_axis='time', y_axis='mel')
-        plt.colorbar()
-        plt.title(name)
-        plt.tight_layout()
-        plt.savefig('media/'+path)
-        return path
-
     def extract_features_song(self, song):
         y, _ = librosa.load(song)
 
@@ -90,10 +77,3 @@ class Manager:
         prediction, values = self.nn.predict_custom(features)
         return self.song_converter(prediction), values
 
-    def prediction_bar_plot(self, values, name):
-        name += 'bar.png'
-        # print('values: ', values)
-        plt.bar(['blues', 'class', 'cntry', 'disco', 'hiphop', 'jazz', 'metal', 'pop', 'reggae', 'rock'], values)
-        plt.title('Probability of classification')
-        plt.savefig('media/'+name)
-        return name
