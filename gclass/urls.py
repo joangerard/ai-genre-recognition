@@ -9,6 +9,7 @@ urlpatterns = [
     # For example, in html code {% url 'to_do_list:to_do_list' %} will be mapped to url http://localhost:8000/to_do/list_all
     path('upload', views.upload, name='upload'),
     path('upload_zip', views.upload_zip, name='upload_zip'),
+    path('download_zip', views.download_zip, name='download_zip'),
     path('prediction/<value>/<mfcc_path>/<bar>', views.prediction, name='prediction'),
     path('about_us', views.about_us, name='about_us'),
 ]

@@ -9,6 +9,8 @@ from zipfile import ZipFile
 import zipfile
 import shutil
 from django.http import HttpResponse, Http404
+from django.views.decorators.csrf import csrf_exempt, csrf_protect  # Add this
+from django.http import JsonResponse
 
 import os
 
@@ -26,7 +28,7 @@ def upload(request):
             plotter = Plotter()
 
             base_url = 'prediction'
-            prediction, values = manager.predict(fs.path(upload_file.name)) # 2 category=42
+            prediction, values = manager.predict(fs.path(upload_file.name))  # 2 category=42
             bar = plotter.prediction_bar_plot(values, upload_file.name)
             mfcc_path = plotter.save_mfcc(fs.path(upload_file.name), upload_file.name)
             url = '{}/{}/{}/{}'.format(base_url, prediction, mfcc_path, bar)
@@ -34,9 +36,11 @@ def upload(request):
     return render(request, PROJECT_PATH + '/pages/upload.html')
 
 
+@csrf_exempt
 def upload_zip(request):
     if request.method == 'POST':
-        upload_file = request.FILES.get('document')
+        upload_file = request.FILES.get('file')
+        # form = FileUploadForm(data=request.POST, files=request.FILES)
         if upload_file and upload_file.size > 0:
             is_valid_zip = zipfile.is_zipfile(upload_file)
             if is_valid_zip:
@@ -50,17 +54,21 @@ def upload_zip(request):
                                 fs = FileSystemStorage()
                                 fs.save('input/' + name_to_store, f)
                                 manager = Manager()
-                                prediction = manager.predict(fs.path('input/' + name_to_store))  # 2 category=42
+                                prediction,values = manager.predict(fs.path('input/' + name_to_store))  # 2 category=42
                                 url_output = 'output/{0}/{1}'.format(prediction, name_to_store)
                                 fs.save(url_output, f)
+                return JsonResponse({'code': 'ok'})
+            return JsonResponse({'message': 'Not valid Zip File'},status=400)
+        return JsonResponse({'message': 'Empty file'},status=400)
 
-                shutil.make_archive('media/music', 'zip', 'media/output')
-                with open('media/music.zip', 'rb') as fh:
-                    response = HttpResponse(fh.read(), content_type="application/vnd.ms-excel")
-                    response['Content-Disposition'] = 'inline; filename=' + os.path.basename('media/music.zip')
-                    return response
-            return render(request, PROJECT_PATH + '/pages/upload.html', {'not_valid_zip': True})
-    return render(request, PROJECT_PATH + '/pages/upload.html', {'not_valid_object': True})
+
+def download_zip(request):
+    if request.method == 'POST':
+        shutil.make_archive('media/music', 'zip', 'media/output')
+        with open('media/music.zip', 'rb') as fh:
+            response = HttpResponse(fh.read(), content_type="application/vnd.ms-excel")
+            response['Content-Disposition'] = 'inline; filename=' + os.path.basename('media/music.zip')
+            return response
 
 
 def prediction(request, value, mfcc_path, bar):

@@ -17,21 +17,17 @@
             </form>
             </p>
             <p>Or you can upload a zip file containing all your music and we will classify it for you!</p>
-            <form method="post" action="/gclass/upload_zip" enctype="multipart/form-data">
+            <form method="post" id="form_zip" action="/gclass/upload_zip" enctype="multipart/form-data">
                 {% csrf_token %}
-                <input type="file" name="document" class="btn btn-outline-info">
+                <input type="file" name="zip_doc" id="zip_doc" class="btn btn-outline-info">
                 <button id="zip_button" type="submit" class="btn btn-info">Upload .zip file</button>
-                <p id="not_valid_zip">
-                    {% if not_valid_zip %}
-                    Please, select a .zip file
-                    {% endif %}
-                </p>
                 <p id="not_valid_file">
-                    {% if not_valid_object %}
-                    Please, select a file
-                    {% endif %}
                 </p>
-                <img id="loader" src="/media/loader.gif" width="40" height="40"/>
+                <img id="loader" src="/media/spinner.gif" width="60" height="60"/>
+            </form>
+            <form method="post" id="download_zip" action="/gclass/download_zip" enctype="multipart/form-data">
+                {% csrf_token %}
+                <button id="zip_download" type="submit" class="btn btn-info"></button>
             </form>
 
 
@@ -40,11 +36,39 @@
     <script>
     $( document ).ready(function() {
         $("#loader").hide();
-        console.log( "ready!" );
-        $("#zip_button").click(function () {
-            $("#loader").show();
-            $("#not_valid_zip").hide()
-        })
+        $("#not_valid_file").hide();
+        $("#download_zip").hide();
+        $('#form_zip' )
+            .submit( function( e ) {
+                $("#loader").show();
+                $("#not_valid_file").hide();
+                $("#download_zip").hide();
+                var data = new FormData($('#zip_doc'));
+                var input_zip = $('#zip_doc')
+                $.each(input_zip[0].files, function(i, file) {
+                    data.append('file', file);
+                });
+                $.ajax({
+                    url: '/gclass/upload_zip',
+                    data: data,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    method: 'POST',
+                    type: 'POST',
+                    success: function(data){
+                        $('#zip_download').click();
+                    },
+                    error: function(data) {
+                        $("#not_valid_file").show();
+                        $("#not_valid_file").text(data['responseJSON']['message'])
+                    },
+                    complete: function(data) {
+                        $("#loader").hide();
+                    }
+                });
+                e.preventDefault();
+            } );
     });
     </script>
 {% endblock content%}
