@@ -19,4 +19,5 @@ django-bootstrap4 = "==0.0.8"
 librosa = "==0.6.3"
 scipy = "==1.2.1"
 matplotlib = "==3.0.3"
+whitenoise = "==4.1"
 
