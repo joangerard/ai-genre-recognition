@@ -110,6 +110,6 @@ venv.bak/
 
 /venv/bin
 
-*/media/*.png
-*/media/*au
+media/*.png
+media/*au
 test.txt
