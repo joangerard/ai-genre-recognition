@@ -1,3 +1,5 @@
+import random
+
 from django.shortcuts import render, redirect
 # Import ToDo model class defined in current models.py file.
 from django.core.files.storage import FileSystemStorage
@@ -44,27 +46,34 @@ def upload_zip(request):
         if upload_file and upload_file.size > 0:
             is_valid_zip = zipfile.is_zipfile(upload_file)
             if is_valid_zip:
+                request_id = random.randint(1,100001)
                 with ZipFile(upload_file) as zip_file:
                     names = zip_file.namelist()
                     for name in names[1:]:
                         if "__MACOSX" not in name:
-                            with zip_file.open(name) as f:
-                                split_name = name.split('/')
-                                name_to_store = split_name[1] if len(split_name) > 1 else name
-                                fs = FileSystemStorage()
-                                fs.save('input/' + name_to_store, f)
-                                manager = Manager()
-                                prediction,values = manager.predict(fs.path('input/' + name_to_store))  # 2 category=42
-                                url_output = 'output/{0}/{1}'.format(prediction, name_to_store)
-                                fs.save(url_output, f)
-                return JsonResponse({'code': 'ok'})
+                            if "DS_Store" not in name:
+                                with zip_file.open(name) as f:
+                                    split_name = name.split('/')
+                                    name_to_store = split_name[1] if len(split_name) > 1 else name
+                                    directory_to_save = str(request_id)+'/input/' + name_to_store
+                                    fs = FileSystemStorage()
+                                    fs.save(directory_to_save, f)
+                                    manager = Manager()
+                                    prediction,values = manager.predict(fs.path(directory_to_save))  # 2 category=42
+                                    url_output = '{0}/output/{1}/{2}'.format(str(request_id),prediction, name_to_store)
+                                    fs.save(url_output, f)
+                return JsonResponse({'code': 'ok','request_id':request_id})
             return JsonResponse({'message': 'Not valid Zip File'},status=400)
         return JsonResponse({'message': 'Empty file'},status=400)
 
 
 def download_zip(request):
     if request.method == 'POST':
-        shutil.make_archive('media/music', 'zip', 'media/output')
+
+        request_id = request.POST.get('request_id')
+        output_dir = 'media/{0}/output'.format(request_id)
+        shutil.make_archive('media/music', 'zip', output_dir)
+        shutil.rmtree('media/{0}'.format(request_id))
         with open('media/music.zip', 'rb') as fh:
             response = HttpResponse(fh.read(), content_type="application/vnd.ms-excel")
             response['Content-Disposition'] = 'inline; filename=' + os.path.basename('media/music.zip')

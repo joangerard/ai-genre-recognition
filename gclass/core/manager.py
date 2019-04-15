@@ -28,6 +28,9 @@ class Manager:
         plt.tight_layout()
         plt.show()
 
+    def fit(self,training_inputs, training_outputs):
+        self.nn.fit(training_inputs,training_outputs)
+
     def extract_features_song(self, song):
         y, _ = librosa.load(song)
 
