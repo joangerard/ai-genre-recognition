@@ -8,6 +8,10 @@ from .text import Text
 from .neural_network import NeuralNetwork
 # from keras.utils.np_utils import to_categorical
 
+"""
+Class manager that is in charge of manage song features extraction
+like mfcc, handle data, standarize it, etc.
+"""
 class Manager:
 
     def __init__(self):
@@ -59,6 +63,9 @@ class Manager:
 
         return np.stack(all_features), onehot_labels
 
+    """
+    Split data for cross-validation.
+    """
     def cross_validation_data(self, all_data):
         training_split = 0.8
 
@@ -75,6 +82,9 @@ class Manager:
 
         return train_input, train_labels, test_input, test_labels
 
+    """
+    Predict data. 
+    """
     def predict(self, data):
         features = self.extract_features_song(data)
         prediction, values = self.nn.predict_custom(features)

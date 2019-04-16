@@ -1,5 +1,18 @@
 # Genre Recognition using Neural Networks
-AI application that recognizes genre of songs.
+
+AI project to recognize genre of a song/group of songs.
+
+The project uses GTZAN data set to extract MFCC information about each song and then it uses that data to train a Neural
+Network composed by one input layer of 25000 neurons (1 for each data extracted from mfcc), one hidden layer
+of 100 neurons and one output layer of 10 outputs that corresponds to the 10 genres it classifies: blues, jazz, pop, 
+hip-hop, rock, metal, country, disco, reggae, classical. The accuracy of this NN is 48%, better that random selection.
+
+Which is nice about this project is that we developed the neural network from scratch based on Andrew Ng Machine Learning
+Course on Coursera and Python Artificial Intelligence Projects for Beginners book from Joshua Eckroth.
+
+It is developed under the DJango framework with Python3.7 offering to the user a graphical interface to test the final 
+results of a trained NN. Upload a single song file and a bunch of song files as a .zip.
+
 ## Setup
 Create virtual environment
 ```bash

@@ -1,5 +1,9 @@
 import pickle
 
+
+"""
+Responsible to save/retrieve objects to/from a text file as a binary object.
+"""
 class Text:
     def read(self, file_name):
         file = open(file_name, 'rb')

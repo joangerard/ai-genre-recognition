@@ -2,6 +2,9 @@ import numpy as np
 import scipy.optimize as opt
 from .text import Text
 
+"""
+Responsible to handle neural network training, prediction, accurary, etc.
+"""
 class NeuralNetwork:
 
     def __init__(self):
@@ -31,6 +34,9 @@ class NeuralNetwork:
         return np.argmax(a3), a3
 
 
+    """
+    Test the accuracy of test inputs.
+    """
     def accuracy(self, test_input, test_output):
         thetha_opt = self.text.read('theta_opt_l12.txt')
         theta1, theta2 = self.extract_thetas(thetha_opt, self.dimi_1, self.dimo_1, self.dimo_2)
@@ -55,6 +61,10 @@ class NeuralNetwork:
         return accurates/m
 
 
+    """
+    By convenience we save the optimized weights into a text file as a binary object so we 
+    need to train the NN only once and the reload the weights wherever we need them.
+    """
     def fit(self, training_inputs, training_outputs):
         self.theta1 = self.random_init_theta(self.dimi_1 + 1, self.dimo_1, self.epsilon_theta) # 100 x 25001
         self.theta2 = self.random_init_theta(self.dimi_2 + 1, self.dimo_2, self.epsilon_theta) # 10 x 101
@@ -71,6 +81,9 @@ class NeuralNetwork:
 
     # def  predict(self, theta_opt):
 
+    """
+    This method was helpful to check the correct implementation of gradient.
+    """
     def gradientCheck(self, theta, backprop_params, input_layer_size, hidden_layer_size, num_labels, lamb, training_inputs, training_outputs):
         epsilon = 0.0001
         n_elems = len(theta)

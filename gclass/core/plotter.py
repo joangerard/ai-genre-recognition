@@ -3,7 +3,9 @@ import librosa
 import librosa.feature
 import librosa.display
 
-
+"""
+Responsible to handle plots.
+"""
 class Plotter:
 
     def save_mfcc(self, song, name):
