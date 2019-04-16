@@ -49,19 +49,20 @@ def upload_zip(request):
                 request_id = random.randint(1,100001)
                 with ZipFile(upload_file) as zip_file:
                     names = zip_file.namelist()
-                    for name in names[1:]:
+                    for name in names:
                         if "__MACOSX" not in name:
                             if "DS_Store" not in name:
                                 with zip_file.open(name) as f:
                                     split_name = name.split('/')
                                     name_to_store = split_name[1] if len(split_name) > 1 else name
-                                    directory_to_save = str(request_id)+'/input/' + name_to_store
-                                    fs = FileSystemStorage()
-                                    fs.save(directory_to_save, f)
-                                    manager = Manager()
-                                    prediction,values = manager.predict(fs.path(directory_to_save))  # 2 category=42
-                                    url_output = '{0}/output/{1}/{2}'.format(str(request_id),prediction, name_to_store)
-                                    fs.save(url_output, f)
+                                    if len(name_to_store) > 0:
+                                        directory_to_save = str(request_id)+'/input/' + name_to_store
+                                        fs = FileSystemStorage()
+                                        fs.save(directory_to_save, f)
+                                        manager = Manager()
+                                        prediction,values = manager.predict(fs.path(directory_to_save))  # 2 category=42
+                                        url_output = '{0}/output/{1}/{2}'.format(str(request_id),prediction, name_to_store)
+                                        fs.save(url_output, f)
                 return JsonResponse({'code': 'ok','request_id':request_id})
             return JsonResponse({'message': 'Not valid Zip File'},status=400)
         return JsonResponse({'message': 'Empty file'},status=400)
