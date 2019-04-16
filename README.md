@@ -8,7 +8,8 @@ of 100 neurons and one output layer of 10 outputs that corresponds to the 10 gen
 hip-hop, rock, metal, country, disco, reggae, classical. The accuracy of this NN is 48%, better that random selection.
 
 Which is nice about this project is that we developed the neural network from scratch based on Andrew Ng Machine Learning
-Course on Coursera and Python Artificial Intelligence Projects for Beginners book from Joshua Eckroth.
+Course on Coursera, Python Artificial Intelligence Projects for Beginners book by Joshua Eckroth and 
+[this amazing blog by Srikar.](https://medium.com/analytics-vidhya/neural-networks-for-digits-recognition-e11d9dff00d5)
 
 It is developed under the DJango framework with Python3.7 offering to the user a graphical interface to test the final 
 results of a trained NN. Upload a single song file and a bunch of song files as a .zip.
